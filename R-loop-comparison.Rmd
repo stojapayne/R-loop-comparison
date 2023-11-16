@@ -1,0 +1,36 @@
+---
+title: "R-loop comparison"
+author: "Aiola Stoja"
+date: "2023-11-16"
+output: html_document
+---
+
+```{r setup packages, include=FALSE}
+
+library(readxl)
+library(tidyr)
+library(dplyr)
+
+
+```
+
+
+```{r cars}
+
+my_data <- read_xlsx("tables1_Helicases_in_R-loop_Formation_and_Resolution.xlsx")%>% 
+  mutate(`Table S1. R-loop binding proteins` = strsplit(as.character(`Table S1. R-loop binding proteins`), ";")) %>% 
+    unnest(`Table S1. R-loop binding proteins`)
+  
+  
+    separate_rows(my_data$`Table S1. R-loop binding proteins`, my_data$...2, my_data$...3, my_data$...4, my_data$...5, my_data$...6)
+
+naomit_mydata <- lapply(my_data, function(x) x[!is.na(x)])
+
+
+```
+
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
