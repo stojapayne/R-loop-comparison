@@ -11,7 +11,7 @@ library(readxl)
 library(tidyr)
 library(dplyr)
 library(purrr)
-
+library("biomaRt")
 
 ```
 
@@ -29,7 +29,24 @@ naomit_mydata_semicolonseperated<-naomit_mydata %>%
 ```
 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r determine whether list is geneID or proteinID, echo=FALSE}
+
+ensembl=useMart("ensembl")
+ensembl = useDataset("hsapiens_gene_ensembl",mart=ensembl)
+filters = listFilters(ensembl)
+attributes = listAttributes(ensembl)
+
+
+goids = getBM(
+
+        #you want entrezgene so you know which is what, the GO ID and
+        # name_1006 is actually the identifier of 'Go term name'
+        attributes=listAttributes(c('entrezgene','go_id', 'name_1006')), 
+
+        filters='entrezgene', 
+        values=naomit_mydata_semicolonseperated[["...2"]], 
+        mart=useMart(ensembl))
+
+
 ```
 
