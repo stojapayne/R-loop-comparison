@@ -31,31 +31,17 @@ my_data_names<- sapply(my_data,'[[',1)
 
 names(my_data) <- c(my_data_names[[1]], my_data_names[[2]], my_data_names[[3]], my_data_names[[4]], my_data_names[[5]], my_data_names[[6]])
 
-my_list <- set_names(my_list, c('label1', 'label2', 'label3'))
-imap(my_data_names, ~ set_names(.x, paste(.y, seq_along(.x), sep = ".")))
-
-
-my_data_names[[1]]
-
-names(my_data)<- my_data_names[[1:6]]
-
-as.data.frame(my_data_names)
-
-names(my_data)
-
-sapply(my_data,'[[',1)
-
-my_data[1]
-
-my_data<- assign(my_data)
 
 #%>%
  #map(function(a) a[-1]) 
 
-naomit_mydata <- lapply(my_data, function(x) x[!is.na(x)])
+#naomit_mydata <- lapply(my_data, function(x) x[!is.na(x)]) %>%
+ # map(function(a) a[-1]) 
 
 
-naomit_mydata_semicolonseperated<-naomit_mydata %>%
+naomit_mydata_semicolonseperated <- my_data %>%
+  map(function(v) v[-1]) %>%
+  map(function(w) w[!is.na(w)]) %>%
   map(function(x) strsplit(as.character(x), ";")) %>%
   map(function(y) unlist(y)) %>%
   map(function(z) unique(z)) 
