@@ -55,7 +55,7 @@ naomit_mydata_semicolonseperated <- my_data %>%
 genes.venn <- euler(naomit_mydata_semicolonseperated)
 plot(genes.venn, quantities = TRUE)
 
-VennPartition<-get.venn.partitions(naomit_mydata) %>% dplyr::as_tibble()
+VennPartition<-get.venn.partitions(naomit_mydata_semicolonseperated) %>% dplyr::as_tibble()
 
 
 listVennPartition <- setNames(as.list(VennPartition$..values..), VennPartition$..set..)
