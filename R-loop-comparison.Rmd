@@ -10,20 +10,55 @@ output: html_document
 library(readxl)
 library(tidyr)
 library(dplyr)
+library(VennDiagram)
+library(devtools)
+#install_github("wjawaid/enrichR")
+library(enrichR)
+library(ggpubr)
+library(kableExtra)
+library(eulerr)
 library(purrr)
-library("biomaRt")
+
 
 ```
 
 
 ```{r readin table}
 
-my_data <- as.list(read_xlsx("tables1_Helicases_in_R-loop_Formation_and_Resolution.xlsx"))
+my_data <- as.list(read_xlsx("tables1_Helicases_in_R-loop_Formation_and_Resolution.xlsx")) 
+
+my_data_names<- sapply(my_data,'[[',1)
+
+names(my_data) <- c(my_data_names[[1]], my_data_names[[2]], my_data_names[[3]], my_data_names[[4]], my_data_names[[5]], my_data_names[[6]])
+
+my_list <- set_names(my_list, c('label1', 'label2', 'label3'))
+imap(my_data_names, ~ set_names(.x, paste(.y, seq_along(.x), sep = ".")))
+
+
+my_data_names[[1]]
+
+names(my_data)<- my_data_names[[1:6]]
+
+as.data.frame(my_data_names)
+
+names(my_data)
+
+sapply(my_data,'[[',1)
+
+my_data[1]
+
+my_data<- assign(my_data)
+
+#%>%
+ #map(function(a) a[-1]) 
+
 naomit_mydata <- lapply(my_data, function(x) x[!is.na(x)])
+
 
 naomit_mydata_semicolonseperated<-naomit_mydata %>%
   map(function(x) strsplit(as.character(x), ";")) %>%
-  map(function (y) unlist(y))
+  map(function(y) unlist(y)) %>%
+  map(function(z) unique(z)) 
 
 
 ```
@@ -31,21 +66,16 @@ naomit_mydata_semicolonseperated<-naomit_mydata %>%
 
 ```{r determine whether list is geneID or proteinID, echo=FALSE}
 
-ensembl=useMart("ensembl")
-ensembl = useDataset("hsapiens_gene_ensembl",mart=ensembl)
-filters = listFilters(ensembl)
-attributes = listAttributes(ensembl)
+genes.venn <- euler(naomit_mydata_semicolonseperated)
+plot(genes.venn, quantities = TRUE)
+
+VennPartition<-get.venn.partitions(naomit_mydata) %>% dplyr::as_tibble()
 
 
-goids = getBM(
+listVennPartition <- setNames(as.list(VennPartition$..values..), VennPartition$..set..)
 
-        #you want entrezgene so you know which is what, the GO ID and
-        # name_1006 is actually the identifier of 'Go term name'
-        attributes=listAttributes(c('entrezgene','go_id', 'name_1006')), 
 
-        filters='entrezgene', 
-        values=naomit_mydata_semicolonseperated[["...2"]], 
-        mart=useMart(ensembl))
+
 
 
 ```
