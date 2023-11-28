@@ -48,14 +48,48 @@ naomit_mydata_semicolonseperated <- my_data %>%
 
 
 ```
+```{r venn diagram of rnaseH comparison and s9.6 comparison seperately, echo=FALSE}
+
+genes.venn_rnaseH <- euler(c(naomit_mydata_semicolonseperated[4], naomit_mydata_semicolonseperated[5]))
+genes.venn_s9.6 <- euler(c(naomit_mydata_semicolonseperated[1], naomit_mydata_semicolonseperated[3]))
+plot(genes.venn_rnaseH, quantities = TRUE, count = TRUE)
+plot(genes.venn_s9.6, quantities = TRUE, count = TRUE)
+
+VennPartition<-get.venn.partitions(c(naomit_mydata_semicolonseperated[4], naomit_mydata_semicolonseperated[5], 
+                                     naomit_mydata_semicolonseperated[1], naomit_mydata_semicolonseperated[3])) %>% dplyr::as_tibble()
 
 
-```{r determine whether list is geneID or proteinID, echo=FALSE}
+listVennPartition <- setNames(as.list(VennPartition$..values..), VennPartition$..set..)
 
-genes.venn <- euler(naomit_mydata_semicolonseperated)
-plot(genes.venn, quantities = TRUE)
 
-VennPartition<-get.venn.partitions(naomit_mydata_semicolonseperated) %>% dplyr::as_tibble()
+
+
+
+```
+
+```{r venn diagram for all rnaseh combined and all s9.6 combined, echo=FALSE}
+
+rnaseh_combined <- mapply(c, naomit_mydata_semicolonseperated[4], naomit_mydata_semicolonseperated[5]) %>%
+  unique() #if you want to see which are duplicated, you can do duplicated()
+s9.6_combined <- mapply(c, naomit_mydata_semicolonseperated[1], naomit_mydata_semicolonseperated[3]) %>%
+  unique()
+
+combined_list <- list(rnaseh_combined, s9.6_combined)
+
+names(combined_list) <- c("rnaseh_combined", "s9.6_combined")
+
+genes.venn_combined <- euler(combined_list)
+plot(genes.venn_combined, quantities = TRUE)
+
+
+
+
+
+plot(genes.venn_rnaseH, quantities = TRUE, count = TRUE)
+plot(genes.venn_s9.6, quantities = TRUE, count = TRUE)
+
+VennPartition<-get.venn.partitions(c(naomit_mydata_semicolonseperated[4], naomit_mydata_semicolonseperated[5], 
+                                     naomit_mydata_semicolonseperated[1], naomit_mydata_semicolonseperated[3])) %>% dplyr::as_tibble()
 
 
 listVennPartition <- setNames(as.list(VennPartition$..values..), VennPartition$..set..)
