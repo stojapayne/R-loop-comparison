@@ -66,7 +66,7 @@ naomit_mydata_semicolonseperated <- my_data %>%
 ```{r venn diagram of rnaseH comparison , echo=FALSE,message=FALSE, warning=FALSE}
 
 genes.venn_rnaseH <- euler(c(naomit_mydata_semicolonseperated[4], naomit_mydata_semicolonseperated[5]))
-plot(genes.venn_rnaseH, quantities = list(type = c("counts", "percent"), cex = 2), labels = list(cex=0.7), adjust_labels = TRUE)
+plot(genes.venn_rnaseH, quantities = list(type = c("counts", "percent"), cex = 1.6), labels = list(cex=0.5), adjust_labels = TRUE)
 
 ```
 
@@ -153,6 +153,48 @@ if (websiteLive) {
 }
 
 
+
+```
+
+```{r trying to get unique pathways, echo=FALSE, message=FALSE, warning=FALSE, results = 'hide'}
+
+df1 <- as.data.frame(enrichedCombinedRnaseH$GO_Biological_Process_2015)
+df2 <- as.data.frame(enrichedCombinedS9.6$GO_Biological_Process_2015)
+df3 <- as.data.frame(enrichedCombinedShared$GO_Biological_Process_2015)
+
+antijoin <- anti_join(df_GOCombinedRnaseH, df_GOCombinedShared, by = "Term")
+
+
+list_GOcombined<- list(df_GOCombinedRnaseH, 
+                       df_GOCombinedS9.6, 
+                       df_GOCombinedShared)
+names(list_GOcombined) <- c("RnaseH_combined_GObiologicalprocess", "S9.6_combined_GObiologicalprocess", "combined_shared_GObiologicalprocess")
+
+
+list_GOcombined2 <- lapply(list_GOcombined, function(z) z[!duplicated(z$),])
+
+df_varnames <- ls()[ grep("^df[0-9]+$", ls()) ]
+dflist <- sapply(df_varnames, get, simplify = FALSE)
+dflist2 <- lapply(dflist, function(z) z[!duplicated(z$id),])
+
+dflist$df1$Term
+
+dflist$df1$Term
+
+list_GOcombined$RnaseH_combined_GObiologicalprocess$Term
+
+list_GOcombined[[Term]]
+
+
+list_GOcombined$RnaseH_combined_GObiologicalprocess$Term
+
+df2_GOCombinedRnaseH <- as.data.frame(res$RnaseH_combined_GObiologicalprocess)
+df2_GOCombinedS9.6 <- as.data.frame(res$S9.6_combined_GObiologicalprocess)
+df2_GOCombinedShared <- as.data.frame(res$combined_shared_GObiologicalprocess)
+
+
+un <- unlist(list_GOcombined)
+res <- Map(`[`, list_GOcombined, relist(!duplicated(list_GOcombined), skeleton = list_GOcombined))
 
 ```
 
