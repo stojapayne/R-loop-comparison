@@ -4,6 +4,11 @@ author: "Aiola Stoja"
 date: "2023-11-16"
 output: html_document
 ---
+<style type="text/css">
+   .main-container {max-width: 100%;}
+   .row {display: flex;}
+   .column {flex: 50%;}
+</style>
 
 ```{r setup packages, include=FALSE}
 
@@ -19,12 +24,14 @@ library(kableExtra)
 library(eulerr)
 library(purrr)
 library(ggplot2)
+library(viridis)
+library(stringr)
 
 
 ```
 
 
-```{r readin table, include = false}
+```{r readin table, include = FALSE}
 
 my_data <- as.list(read_xlsx("tables1_Helicases_in_R-loop_Formation_and_Resolution.xlsx")) 
 
@@ -41,44 +48,41 @@ names(my_data) <- c(my_data_names[[1]], my_data_names[[2]], my_data_names[[3]], 
 
 
 naomit_mydata_semicolonseperated <- my_data %>%
-  map(function(v) v[-1]) %>%
-  map(function(w) w[!is.na(w)]) %>%
-  map(function(x) strsplit(as.character(x), ";")) %>%
-  map(function(y) unlist(y)) %>%
-  map(function(z) unique(z)) 
+  map(function(v) v[-1]) %>% #remove the first row (it was either blank or not necessary)
+  map(function(w) w[!is.na(w)]) %>% #remove all na values in the list
+  map(function(x) strsplit(as.character(x), ";")) %>% #split any values in the list/data frame by semicolon, and send to a new row
+  map(function(y) unlist(y)) %>% # add each column to a sepearate list
+  map(function(z) unique(z)) #remove any duplicate values
 
 ```
 
 <div class = "row">
 <div class = "column">
 
-## Venn Diagrams
+## Venn Diagrams {.tabset}
 
 ### Comparing genes from two different RNaseH experiments
 
-```{r venn diagram of rnaseH comparison , echo=FALSE}
+```{r venn diagram of rnaseH comparison , echo=FALSE,message=FALSE, warning=FALSE}
 
 genes.venn_rnaseH <- euler(c(naomit_mydata_semicolonseperated[4], naomit_mydata_semicolonseperated[5]))
-plot(genes.venn_rnaseH, quantities = TRUE, count = TRUE)
+plot(genes.venn_rnaseH, quantities = list(type = c("counts", "percent"), cex = 2), labels = list(cex=0.7), adjust_labels = TRUE)
 
 ```
 
 ### Comparing genes from two different S9.6 experiments
 
-```{r venn diagram  s9.6 comparison seperately, echo=FALSE}
+```{r venn diagram  s9.6 comparison seperately, echo=FALSE,message=FALSE, warning=FALSE}
 
 genes.venn_s9.6 <- euler(c(naomit_mydata_semicolonseperated[1], naomit_mydata_semicolonseperated[3]))
-plot(genes.venn_s9.6, quantities = TRUE, count = TRUE)
-
-VennPartition<-get.venn.partitions(c(naomit_mydata_semicolonseperated[4], naomit_mydata_semicolonseperated[5], 
-                                     naomit_mydata_semicolonseperated[1], naomit_mydata_semicolonseperated[3])) %>% dplyr::as_tibble()
-
-listVennPartition <- setNames(as.list(VennPartition$..values..), VennPartition$..set..)
+plot(genes.venn_s9.6, quantities = list(type = c("counts", "percent"), cex = 2), labels = list(cex=0.7), adjust_labels = TRUE)
 
 
 ```
 
-```{r venn diagram for all rnaseh combined and all s9.6 combined, echo=FALSE}
+### Comparing all RNaseH and S9.6 genes 
+
+```{r venn diagram for all rnaseh combined and all s9.6 combined, echo=FALSE,message=FALSE, warning=FALSE}
 
 rnaseh_combined <- mapply(c, naomit_mydata_semicolonseperated[4], naomit_mydata_semicolonseperated[5]) %>%
   unique() #if you want to see which are duplicated, you can do duplicated()
@@ -90,21 +94,22 @@ combined_list <- list(rnaseh_combined, s9.6_combined)
 names(combined_list) <- c("rnaseh_combined", "s9.6_combined")
 
 genes.venn_combined <- euler(combined_list)
-plot(genes.venn_combined, quantities = TRUE, fills = c("blue", "purple", "green"))
+plot(genes.venn_combined, quantities = list(type = c("counts", "percent"), cex = 2), fills = c("blue", "purple", "green"), adjust_labels = TRUE)
 
 
 
 combinedVennPartition <- get.venn.partitions(combined_list)
 listCombinedV.P <- setNames(as.list(combinedVennPartition$..values..), combinedVennPartition$..set..)
 
-
-
-
 ```
 
+</div>
+
+<div class = "column">
 
 
-```{r Pathway analysis for combined rnaseh and s9.6 venn diagram, echo=FALSE}
+
+```{r setup for Pathway analysis , include=FALSE}
 
 websiteLive <- getOption("enrichR.live")
 if (websiteLive) {
@@ -115,6 +120,11 @@ if (websiteLive) {
 }
 
 dbs <- c("GO_Molecular_Function_2015", "GO_Cellular_Component_2015", "GO_Biological_Process_2015")
+
+```
+
+
+```{r Pathway analysis for combined rnaseh and s9.6 venn diagram, echo=FALSE, message=FALSE, warning=FALSE, results = 'hide'}
 
 ##Shared 
 
