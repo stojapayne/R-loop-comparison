@@ -78,21 +78,40 @@ combined_list <- list(rnaseh_combined, s9.6_combined)
 
 names(combined_list) <- c("rnaseh_combined", "s9.6_combined")
 
-genes.venn_combined <- euler(combined_list)
-plot(genes.venn_combined, quantities = TRUE)
-
-
-
-
-
 plot(genes.venn_rnaseH, quantities = TRUE, count = TRUE)
 plot(genes.venn_s9.6, quantities = TRUE, count = TRUE)
 
-VennPartition<-get.venn.partitions(c(naomit_mydata_semicolonseperated[4], naomit_mydata_semicolonseperated[5], 
-                                     naomit_mydata_semicolonseperated[1], naomit_mydata_semicolonseperated[3])) %>% dplyr::as_tibble()
+combinedVennPartition <- get.venn.partitions(combined_list)
+listCombinedV.P <- setNames(as.list(combinedVennPartition$..values..), combinedVennPartition$..set..)
 
 
-listVennPartition <- setNames(as.list(VennPartition$..values..), VennPartition$..set..)
+
+
+```
+
+
+
+```{r Pathway analysis for combined rnaseh and s9.6 venn diagram, echo=FALSE}
+
+websiteLive <- getOption("enrichR.live")
+if (websiteLive) {
+    listEnrichrSites()
+    setEnrichrSite("Enrichr") # Human genes   
+}
+
+if (websiteLive) dbs <- listEnrichrDbs()
+
+dbs <- c("GO_Molecular_Function_2015", "GO_Cellular_Component_2015", "GO_Biological_Process_2015")
+
+if (websiteLive) {
+    enrichedCombinedShared <- enrichr(listCombinedV.P[["rnaseh_combined∩s9.6_combined"]], dbs)
+}
+
+if (websiteLive) {
+    plotEnrich(enrichedCombinedShared$GO_Biological_Process_2015, showTerms = 20, numChar = 40, y = "Count", orderBy = "Adjusted.P.value", title = "Rnaseh and s9.6 shared genes")
+}
+
+
 
 
 
