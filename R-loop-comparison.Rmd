@@ -91,10 +91,10 @@ s9.6_combined <- mapply(c, naomit_mydata_semicolonseperated[1], naomit_mydata_se
 
 combined_list <- list(rnaseh_combined, s9.6_combined)
 
-names(combined_list) <- c("rnaseh_combined", "s9.6_combined")
+names(combined_list) <- c("RNase H", "S9.6")
 
 genes.venn_combined <- euler(combined_list)
-plot(genes.venn_combined, quantities = list(type = c("counts", "percent"), cex = 2), fills = c("blue", "purple", "green"), adjust_labels = TRUE)
+plot(genes.venn_combined, quantities = list(type = c("counts", "percent"), cex = 2), fills = c("blue", "red", "white"), adjust_labels = TRUE)
 
 
 
@@ -183,6 +183,8 @@ s9.6uniquevsallshared <- as.data.frame(generics::intersect(df_enrichedCombinedAl
 Rnaseuniquevsallshared<-as.data.frame(generics::intersect(df_enrichedCombinedAllShared$Term,
                                                           df_enrichedCombinedRNaseH$Term))
 SharedUniqueProtein <- as.data.frame(generics::intersect(df_enrichedCombinedAllShared$Term, 
-                                                         df_enrichedCombinedShared$Term))                                                       
+                                                         df_enrichedCombinedShared$Term))    
+
+write.csv(df_enrichedCombinedAllShared, "df_erichedcombinedallshared.csv")
 
 ```
